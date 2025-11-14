@@ -1,0 +1,93 @@
+/* Hourly Performance Chart */
+.hourly-chart {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.hourly-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 20px 0;
+}
+
+.hourly-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hourly-row {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    align-items: center;
+    gap: 12px;
+}
+
+.hourly-time {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+    text-align: right;
+}
+
+.hourly-bar-container {
+    position: relative;
+    height: 32px;
+    background: #f3f4f6;
+    border-radius: 4px;
+    overflow: visible;
+}
+
+.hourly-bar {
+    position: absolute;
+    height: 100%;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.hourly-bar:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.hourly-bar-profit {
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    left: 50%;
+}
+
+.hourly-bar-loss {
+    background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%);
+    right: 50%;
+}
+
+.hourly-center-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #9ca3af;
+    z-index: 1;
+}
+
+/* Amount labels - positioned at end of bars */
+.hourly-amount {
+    position: absolute;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+    white-space: nowrap;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.hourly-amount-right {
+    left: calc(50% + 5px); /* 5px padding from center */
+}
+
+.hourly-amount-left {
+    right: calc(50% + 5px); /* 5px padding from center */
+}

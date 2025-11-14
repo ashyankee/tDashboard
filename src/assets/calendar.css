@@ -1,0 +1,213 @@
+/* Calendar Component Styles */
+
+.calendar-container {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.cal-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.cal-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.cal-total-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0 0 5px 0;
+    text-align: right;
+}
+
+.cal-total {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cal-total-arrow {
+    font-size: 24px;
+}
+
+.cal-total-amount {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.cal-total-profit {
+    color: #10b981;
+}
+
+.cal-total-loss {
+    color: #ef4444;
+}
+
+.cal-header-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.cal-header {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    padding: 8px;
+    text-transform: uppercase;
+}
+
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.cal-day {
+    min-height: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cal-day:hover:not(.cal-empty) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.cal-empty {
+    background: transparent;
+    cursor: default;
+}
+
+.cal-no-trade {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    color: #9ca3af;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.cal-profit {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border: 2px solid #10b981;
+}
+
+.cal-profit:hover {
+    background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%);
+}
+
+.cal-loss {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 2px solid #ef4444;
+}
+
+.cal-loss:hover {
+    background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+}
+
+.cal-today {
+    border: 3px solid #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+}
+
+.cal-day-num {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 2px;
+}
+
+.cal-profit .cal-day-num {
+    color: #065f46;
+}
+
+.cal-loss .cal-day-num {
+    color: #991b1b;
+}
+
+.cal-pnl {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.cal-arrow {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.cal-profit .cal-arrow {
+    color: #059669;
+}
+
+.cal-loss .cal-arrow {
+    color: #dc2626;
+}
+
+.cal-amount {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.cal-profit .cal-amount {
+    color: #065f46;
+}
+
+.cal-loss .cal-amount {
+    color: #991b1b;
+}
+
+.cal-stats {
+    display: flex;
+    gap: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #e5e7eb;
+    justify-content: center;
+}
+
+.cal-stat {
+    text-align: center;
+}
+
+.cal-stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 3px 0;
+}
+
+.cal-stat-green {
+    color: #10b981;
+}
+
+.cal-stat-red {
+    color: #ef4444;
+}
+
+.cal-stat-blue {
+    color: #3b82f6;
+}
+
+.cal-stat-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0;
+}

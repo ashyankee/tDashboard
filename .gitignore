@@ -1,0 +1,14 @@
+/Include/
+/Lib/
+/Scripts/
+/etc/
+/share/
+
+# 2. Ignore IDE and temporary files
+/.idea/
+*.pyc
+__pycache__/
+
+
+src/trades.db
+src/config.py

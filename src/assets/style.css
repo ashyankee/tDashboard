@@ -1,0 +1,237 @@
+/* assets/style.css */
+
+/* Trading Table Styles */
+.trades-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.trades-table thead tr {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.trades-table th {
+    padding: 16px;
+    text-align: left;
+    color: white;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+}
+
+.trades-table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.trades-table tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    background-color: #f9fafb;
+}
+
+.trades-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.trades-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #1f2937;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Ticker styling */
+.trades-table .ticker-cell {
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+}
+
+/* Win row - green background
+.trades-table .win-row {
+    background: linear-gradient(90deg, #d1fae5 0%, #a7f3d0 100%);
+}*/
+
+.trades-table .win-row:hover {
+    background: linear-gradient(90deg, #a7f3d0 0%, #6ee7b7 100%);
+}
+
+/* Loss row - red background
+.trades-table .loss-row {
+    background: linear-gradient(90deg, #fee2e2 0%, #fecaca 100%);
+} */
+
+.trades-table .loss-row:hover {
+    background: linear-gradient(90deg, #fecaca 0%, #fca5a5 100%);
+}
+
+/* Profit/Loss cells with badges */
+.profit-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.profit-positive {
+    background-color: #10b981;
+    color: white;
+}
+
+.profit-negative {
+    background-color: #ef4444;
+    color: white;
+}
+
+/* Percentage badges */
+.percent-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.percent-positive {
+    background-color: #059669;
+    color: white;
+}
+
+.percent-negative {
+    background-color: #dc2626;
+    color: white;
+}
+
+/* Hold time badge */
+.hold-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 8px;
+    background-color: #e0e7ff;
+    color: #4338ca;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+/* Date cell */
+.date-cell {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* Price cells */
+.price-cell {
+    /*font-family: 'Courier New', monospace;*/
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Empty state */
+.empty-trades {
+    text-align: center;
+    padding: 60px 20px;
+    color: #9ca3af;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .trades-table th,
+    .trades-table td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+
+
+/* Calendar - Updated Styles */
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    min-height: 70px;
+    padding: 8px;
+}
+
+.calendar-day:hover:not(.empty) {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.calendar-day.empty {
+    background: transparent;
+    cursor: default;
+    border: none;
+}
+
+.calendar-day.no-trades {
+    background: #f9fafb;
+    color: #9ca3af;
+    border: 1px solid #e5e7eb;
+}
+
+.calendar-day.profit {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+    border: 2px solid #10b981;
+}
+
+.calendar-day.profit:hover {
+    background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%);
+}
+
+.calendar-day.loss {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #991b1b;
+    border: 2px solid #ef4444;
+}
+
+.calendar-day.loss:hover {
+    background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+}
+
+.calendar-day.today {
+    border: 3px solid #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.calendar-day-number {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.calendar-day-amount {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.calendar-day-header {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    padding: 10px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+
+
+}
