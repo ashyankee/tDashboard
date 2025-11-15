@@ -66,7 +66,7 @@ def render_add_trade_form():
             # API Fetch Status
             html.Div(id='api-fetch-status', style={'marginBottom': '15px'}),
 
-            # Row 2: Sector (manual), Industry (API), Volume (API)
+            # Row 2: Sector (API - NOW AUTO-FILLED), Industry (API), Volume (API)
             html.Div([
                 html.Div([
                     html.Label([
@@ -74,66 +74,13 @@ def render_add_trade_form():
                         html.Span("*", style={'color': '#ef4444'})
                     ], style={'fontSize': '14px', 'fontWeight': '500', 'marginBottom': '8px', 'display': 'block'}),
                     html.Div([
-                        dcc.Dropdown(
+                        dcc.Input(
                             id='trade-sector',
-                            options=[
-                                {'label': 'Technology', 'value': 'Technology'},
-                                {'label': 'Healthcare', 'value': 'Healthcare'},
-                                {'label': 'Biotechnology', 'value': 'Biotechnology'},
-                                {'label': 'Pharmaceuticals', 'value': 'Pharmaceuticals'},
-                                {'label': 'Financial Services', 'value': 'Financial Services'},
-                                {'label': 'Banking', 'value': 'Banking'},
-                                {'label': 'Insurance', 'value': 'Insurance'},
-                                {'label': 'Energy', 'value': 'Energy'},
-                                {'label': 'Oil & Gas', 'value': 'Oil & Gas'},
-                                {'label': 'Renewable Energy', 'value': 'Renewable Energy'},
-                                {'label': 'Consumer Cyclical', 'value': 'Consumer Cyclical'},
-                                {'label': 'Consumer Defensive', 'value': 'Consumer Defensive'},
-                                {'label': 'Retail', 'value': 'Retail'},
-                                {'label': 'E-commerce', 'value': 'E-commerce'},
-                                {'label': 'Automotive', 'value': 'Automotive'},
-                                {'label': 'Electric Vehicles', 'value': 'Electric Vehicles'},
-                                {'label': 'Industrial', 'value': 'Industrial'},
-                                {'label': 'Aerospace & Defense', 'value': 'Aerospace & Defense'},
-                                {'label': 'Manufacturing', 'value': 'Manufacturing'},
-                                {'label': 'Real Estate', 'value': 'Real Estate'},
-                                {'label': 'REITs', 'value': 'REITs'},
-                                {'label': 'Telecommunications', 'value': 'Telecommunications'},
-                                {'label': 'Media & Entertainment', 'value': 'Media & Entertainment'},
-                                {'label': 'Gaming', 'value': 'Gaming'},
-                                {'label': 'Utilities', 'value': 'Utilities'},
-                                {'label': 'Materials', 'value': 'Materials'},
-                                {'label': 'Mining', 'value': 'Mining'},
-                                {'label': 'Chemicals', 'value': 'Chemicals'},
-                                {'label': 'Transportation', 'value': 'Transportation'},
-                                {'label': 'Airlines', 'value': 'Airlines'},
-                                {'label': 'Shipping', 'value': 'Shipping'},
-                                {'label': 'Agriculture', 'value': 'Agriculture'},
-                                {'label': 'Food & Beverage', 'value': 'Food & Beverage'},
-                                {'label': 'Cannabis', 'value': 'Cannabis'},
-                                {'label': 'Cryptocurrency', 'value': 'Cryptocurrency'},
-                                {'label': 'Blockchain', 'value': 'Blockchain'},
-                                {'label': 'Artificial Intelligence', 'value': 'Artificial Intelligence'},
-                                {'label': 'Cybersecurity', 'value': 'Cybersecurity'},
-                                {'label': 'Cloud Computing', 'value': 'Cloud Computing'},
-                                {'label': 'Semiconductors', 'value': 'Semiconductors'},
-                                {'label': 'Software', 'value': 'Software'},
-                                {'label': 'Hardware', 'value': 'Hardware'},
-                                {'label': 'Robotics', 'value': 'Robotics'},
-                                {'label': 'Space', 'value': 'Space'},
-                                {'label': 'Clean Technology', 'value': 'Clean Technology'},
-                                {'label': 'Education', 'value': 'Education'},
-                                {'label': 'Fitness & Wellness', 'value': 'Fitness & Wellness'},
-                                {'label': 'Hospitality', 'value': 'Hospitality'},
-                                {'label': 'Travel & Leisure', 'value': 'Travel & Leisure'},
-                                {'label': 'Conglomerate', 'value': 'Conglomerate'},
-                                {'label': 'SPAC', 'value': 'SPAC'},
-                                {'label': 'Penny Stock', 'value': 'Penny Stock'},
-                                {'label': 'Other', 'value': 'Other'},
-                            ]
-                            ,
-                            placeholder='Select sector',
-                            style={'width': 'calc(100% - 30px)'}
+                            type='text',
+                            placeholder='Auto-populated from API',
+                            disabled=True,
+                            style={'width': 'calc(100% - 30px)', 'padding': '8px', 'borderRadius': '6px',
+                                   'border': '1px solid #d1d5db', 'fontSize': '14px', 'backgroundColor': '#f9fafb'}
                         ),
                         html.Span("●", id='icon-sector', className='validation-icon',
                                   style={'fontSize': '18px', 'color': '#9ca3af', 'marginLeft': '8px'})
@@ -301,7 +248,6 @@ def render_add_trade_form():
                         {'label': 'Market Selloff', 'value': 'Market Selloff'},
                         {'label': 'Other', 'value': 'Other'},
                     ],
-                            value='None',
                             style={'width': 'calc(100% - 30px)'}
                         ),
                         html.Span("●", id='icon-news', className='validation-icon',

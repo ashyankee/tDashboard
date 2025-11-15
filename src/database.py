@@ -7,6 +7,8 @@ class TradingDatabase:
     def __init__(self, db_name='trades.db'):
         self.db_name = db_name
         self.create_tables()
+        self.create_logs_table()
+        self.migrate_logs_table()
         self.migrate_tax_settings()
 
     def get_connection(self):
@@ -781,3 +783,230 @@ class TradingDatabase:
         tickers = [row[0] for row in cursor.fetchall()]
         conn.close()
         return tickers
+
+    def get_profits_by_price(self):
+        """Get P/L grouped by entry price bands"""
+        import pandas as pd
+
+        conn = self.get_connection()
+        df = pd.read_sql_query('SELECT entry_price, profit_loss FROM trades', conn)
+        conn.close()
+
+        if len(df) == 0:
+            return []
+
+        # Define price bands
+        def get_price_band(price):
+            if price < 1:
+                return 'Sub $1'
+            elif price < 2:
+                return '$1'
+            elif price < 3:
+                return '$2'
+            elif price < 4:
+                return '$3'
+            elif price < 5:
+                return '$4'
+            elif price < 6:
+                return '$5'
+            elif price < 7:
+                return '$6'
+            elif price < 8:
+                return '$7'
+            elif price < 9:
+                return '$8'
+            elif price < 10:
+                return '$9'
+            elif price < 15:
+                return '$10-14'
+            elif price < 20:
+                return '$15-19'
+            else:
+                return '$20+'
+
+        # Apply price bands
+        df['price_band'] = df['entry_price'].apply(get_price_band)
+
+        # Group by price band and sum P/L
+        grouped = df.groupby('price_band')['profit_loss'].sum().reset_index()
+        grouped.columns = ['price_band', 'pnl']
+
+        # Define band order
+        band_order = ['Sub $1', '$1', '$2', '$3', '$4', '$5', '$6', '$7', '$8', '$9',
+                      '$10-14', '$15-19', '$20+']
+
+        # Sort by band order
+        grouped['sort_order'] = grouped['price_band'].apply(lambda x: band_order.index(x) if x in band_order else 999)
+        grouped = grouped.sort_values('sort_order')
+
+        # Convert to list of dicts
+        result = []
+        for _, row in grouped.iterrows():
+            result.append({
+                'price_band': row['price_band'],
+                'pnl': row['pnl']
+            })
+
+        return result
+
+    def create_logs_table(self):
+        """Create logs table if it doesn't exist"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute('''
+                       CREATE TABLE IF NOT EXISTS logs
+                       (
+                           id
+                           INTEGER
+                           PRIMARY
+                           KEY
+                           AUTOINCREMENT,
+                           timestamp
+                           TIMESTAMP
+                           DEFAULT
+                           CURRENT_TIMESTAMP,
+                           action_type
+                           TEXT
+                           NOT
+                           NULL,
+                           action_category
+                           TEXT
+                           NOT
+                           NULL,
+                           description
+                           TEXT
+                           NOT
+                           NULL,
+                           details
+                           TEXT,
+                           is_read
+                           INTEGER
+                           DEFAULT
+                           0,
+                           created_at
+                           TIMESTAMP
+                           DEFAULT
+                           CURRENT_TIMESTAMP
+                       )
+                       ''')
+
+        conn.commit()
+        conn.close()
+
+    def add_log(self, action_type, action_category, description, details=None):
+        """
+        Add a log entry
+
+        Args:
+            action_type: Type of action (e.g., 'ADD_TRADE', 'DELETE_TRADE', 'ADD_CAPITAL', 'SYSTEM')
+            action_category: Category (e.g., 'TRADE', 'CAPITAL', 'SYSTEM', 'DATABASE')
+            description: Human-readable description
+            details: Additional details (optional, can be JSON string)
+
+        Returns:
+            Log ID
+        """
+        conn = self.get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute('''
+                       INSERT INTO logs (action_type, action_category, description, details)
+                       VALUES (?, ?, ?, ?)
+                       ''', (action_type, action_category, description, details))
+
+        conn.commit()
+        log_id = cursor.lastrowid
+        conn.close()
+
+        return log_id
+
+    def get_all_logs(self, limit=None):
+        """Get all logs, optionally limited"""
+        conn = self.get_connection()
+
+        if limit:
+            query = 'SELECT * FROM logs ORDER BY timestamp DESC LIMIT ?'
+            df = pd.read_sql_query(query, conn, params=(limit,))
+        else:
+            query = 'SELECT * FROM logs ORDER BY timestamp DESC'
+            df = pd.read_sql_query(query, conn)
+
+        conn.close()
+        return df
+
+    def delete_all_logs(self):
+        """Delete all log entries"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT COUNT(*) FROM logs')
+        count = cursor.fetchone()[0]
+
+        cursor.execute('DELETE FROM logs')
+        conn.commit()
+        conn.close()
+
+        return count
+
+    def trim_logs(self, keep_count=25):
+        """Keep only the most recent N logs"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+
+        # Get count before trim
+        cursor.execute('SELECT COUNT(*) FROM logs')
+        before_count = cursor.fetchone()[0]
+
+        # Delete all except the most recent keep_count
+        cursor.execute('''
+                       DELETE
+                       FROM logs
+                       WHERE id NOT IN (SELECT id
+                                        FROM logs
+                                        ORDER BY timestamp DESC
+                           LIMIT ?
+                           )
+                       ''', (keep_count,))
+
+        conn.commit()
+        deleted_count = before_count - keep_count if before_count > keep_count else 0
+        conn.close()
+
+        return deleted_count
+
+    def get_unread_logs_count(self):
+        """Get count of unread logs"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('SELECT COUNT(*) FROM logs WHERE is_read = 0')
+        count = cursor.fetchone()[0]
+        conn.close()
+        return count
+
+    def mark_logs_as_read(self):
+        """Mark all logs as read"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute('UPDATE logs SET is_read = 1 WHERE is_read = 0')
+        conn.commit()
+        conn.close()
+
+    def migrate_logs_table(self):
+        """Add is_read column to existing logs table"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+
+        try:
+            # Check if column exists
+            cursor.execute("PRAGMA table_info(logs)")
+            columns = [col[1] for col in cursor.fetchall()]
+
+            if 'is_read' not in columns:
+                cursor.execute('ALTER TABLE logs ADD COLUMN is_read INTEGER DEFAULT 0')
+                conn.commit()
+                print("✓ Added is_read column to logs table")
+        except Exception as e:
+            print(f"Migration error: {e}")
+        finally:
+            conn.close()

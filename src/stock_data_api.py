@@ -88,3 +88,31 @@ class StockDataAPI:
 
         complete_data['success'] = profile.get('success') and quote.get('success')
         return complete_data
+
+    def get_stock_news(self, ticker, limit=10):
+        """
+        Get recent news for a ticker
+        Returns: list of news articles
+        """
+        if self.requests_today >= self.max_requests:
+            return {'error': 'Daily API limit reached', 'success': False}
+
+        url = f"{self.base_url}/stock_news?tickers={ticker}&limit={limit}&apikey={self.api_key}"
+
+        try:
+            response = requests.get(url, timeout=10)
+            self.requests_today += 1
+
+            if response.status_code == 200:
+                data = response.json()
+                return {
+                    'news': data,
+                    'success': True
+                }
+            return {'error': f'API returned status {response.status_code}', 'success': False}
+        except Exception as e:
+            return {'error': str(e), 'success': False}
+
+    def get_requests_remaining(self):
+        """Get number of API requests remaining today"""
+        return self.max_requests - self.requests_today

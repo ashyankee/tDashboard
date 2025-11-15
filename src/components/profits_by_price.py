@@ -1,13 +1,13 @@
 """
-Hourly Performance Chart Component
-Shows net P/L grouped by 15-minute intervals during trading hours
+Profits by Price Band Component
+Shows total P/L grouped by entry price bands
 """
 from dash import html
 
 
-def render_hourly_chart(db):
+def render_profits_by_price(db):
     """
-    Render hourly performance chart
+    Render profits by price band chart
 
     Args:
         db: TradingDatabase instance
@@ -15,22 +15,22 @@ def render_hourly_chart(db):
     Returns:
         Dash HTML component
     """
-    hourly_data = db.get_hourly_performance()
+    price_data = db.get_profits_by_price()
 
-    if len(hourly_data) == 0:
+    if len(price_data) == 0:
         return html.Div([
-            html.H3("Hourly Performance", className='hourly-title'),
+            html.H3("Profits by Price", className='price-chart-title'),
             html.P("No trades yet",
                    style={'textAlign': 'center', 'color': '#9ca3af', 'padding': '40px'})
-        ], className='hourly-chart')
+        ], className='price-chart')
 
     # Find max absolute value for scaling
-    max_pnl = max(abs(item['pnl']) for item in hourly_data)
+    max_pnl = max(abs(item['pnl']) for item in price_data)
 
-    hourly_rows = []
-    for item in hourly_data:
+    price_rows = []
+    for item in price_data:
         pnl = item['pnl']
-        time_label = item['time']
+        price_band = item['price_band']
 
         # Calculate bar width as percentage (max 45% on each side)
         width_percent = min((abs(pnl) / max_pnl) * 45, 45) if max_pnl > 0 else 0
@@ -38,40 +38,40 @@ def render_hourly_chart(db):
         if pnl > 0:
             # Profit bar (grows right from center)
             bar = html.Div(
-                className='hourly-bar hourly-bar-profit',
+                className='price-bar price-bar-profit',
                 style={'width': f'{width_percent}%'}
             )
             # Amount displayed INSIDE the bar at the end
             amount = html.Div(
                 f"${pnl:,.0f}",
-                className='hourly-amount hourly-amount-right',
+                className='price-amount price-amount-right',
                 style={'left': f'calc(50% + {max(width_percent - 8, 0)}%)'}  # Position inside bar
             )
         else:
             # Loss bar (grows left from center)
             bar = html.Div(
-                className='hourly-bar hourly-bar-loss',
+                className='price-bar price-bar-loss',
                 style={'width': f'{width_percent}%'}
             )
             # Amount displayed INSIDE the bar at the end
             amount = html.Div(
                 f"-${abs(pnl):,.0f}",
-                className='hourly-amount hourly-amount-left',
+                className='price-amount price-amount-left',
                 style={'right': f'calc(50% + {max(width_percent - 8, 0)}%)'}  # Position inside bar
             )
 
-        hourly_rows.append(
+        price_rows.append(
             html.Div([
-                html.Div(time_label, className='hourly-time'),
+                html.Div(price_band, className='price-label'),
                 html.Div([
-                    html.Div(className='hourly-center-line'),
+                    html.Div(className='price-center-line'),
                     bar,
                     amount
-                ], className='hourly-bar-container')
-            ], className='hourly-row')
+                ], className='price-bar-container')
+            ], className='price-row')
         )
 
     return html.Div([
-        html.H3("Hourly Performance", className='hourly-title'),
-        html.Div(hourly_rows, className='hourly-rows')
-    ], className='hourly-chart')
+        html.H3("Profits by Price", className='price-chart-title'),
+        html.Div(price_rows, className='price-rows')
+    ], className='price-chart')

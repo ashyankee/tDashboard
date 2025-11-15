@@ -9,6 +9,7 @@ if sys.version_info >= (3, 12):
 
 import dash
 from dash import dcc, html, Input, Output, State, dash_table
+from components import render_hourly_chart, render_calendar, render_settings, render_profits_by_price
 import plotly.graph_objs as go
 import plotly.express as px
 from datetime import datetime
@@ -22,6 +23,7 @@ sys.path.insert(0, 'src')
 from database import TradingDatabase
 from components import render_hourly_chart, render_calendar, render_settings
 from components.add_trade_form import render_add_trade_form
+from components.analyze import render_analyze
 
 # Import config for API
 try:
@@ -61,6 +63,154 @@ app.index_string = '''
             .Select-value-label {
                 font-family: 'Inter', sans-serif !important;
             }
+
+            /* Tab styling with colors and rounded corners */
+            .tab {
+                border-radius: 8px 8px 0 0 !important;
+                border: none !important;
+                margin-right: 4px !important;
+                transition: all 0.3s ease !important;
+                font-weight: 500 !important;
+            }
+
+            /* Dashboard tab - Blue */
+            .tab:nth-child(1) {
+                background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%) !important;
+                color: white !important;
+            }
+            .tab:nth-child(1):hover {
+                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+            }
+            .tab:nth-child(1).tab--selected {
+                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+                box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3) !important;
+            }
+
+            /* Add Trade tab - Green */
+            .tab:nth-child(2) {
+                background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+                color: white !important;
+            }
+            .tab:nth-child(2):hover {
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            }
+            .tab:nth-child(2).tab--selected {
+                background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+                box-shadow: 0 4px 6px rgba(5, 150, 105, 0.3) !important;
+            }
+
+            /* Analyze tab - Purple */
+            .tab:nth-child(3) {
+                background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%) !important;
+                color: white !important;
+            }
+            .tab:nth-child(3):hover {
+                background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+            }
+            .tab:nth-child(3).tab--selected {
+                background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+                box-shadow: 0 4px 6px rgba(124, 58, 237, 0.3) !important;
+            }
+
+            /* Capital tab - Emerald */
+            .tab:nth-child(4) {
+                background: linear-gradient(135deg, #6ee7b7 0%, #10b981 100%) !important;
+                color: white !important;
+            }
+            .tab:nth-child(4):hover {
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            }
+            .tab:nth-child(4).tab--selected {
+                background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+                box-shadow: 0 4px 6px rgba(5, 150, 105, 0.3) !important;
+            }
+
+            /* Tax Calculator tab - Orange */
+            .tab:nth-child(5) {
+                background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+                color: white !important;
+            }
+            .tab:nth-child(5):hover {
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+            }
+            .tab:nth-child(5).tab--selected {
+                background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+                box-shadow: 0 4px 6px rgba(217, 119, 6, 0.3) !important;
+            }
+
+            /* Logs tab - Red */
+            .tab:nth-child(6) {
+                background: linear-gradient(135deg, #f87171 0%, #ef4444 100%) !important;
+                color: white !important;
+            }
+            .tab:nth-child(6):hover {
+                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            }
+            .tab:nth-child(6).tab--selected {
+                background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+                box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3) !important;
+            }
+
+            /* Maintenance tab - Gray */
+            .tab:nth-child(7) {
+                background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+                color: white !important;
+            }
+            .tab:nth-child(7):hover {
+                background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+            }
+            .tab:nth-child(7).tab--selected {
+                background: linear-gradient(135deg, #4b5563 0%, #374151 100%) !important;
+                box-shadow: 0 4px 6px rgba(75, 85, 99, 0.3) !important;
+            }
+
+            /* Settings tab - Slate */
+            .tab:nth-child(8) {
+                background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%) !important;
+                color: white !important;
+            }
+            .tab:nth-child(8):hover {
+                background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
+            }
+            .tab:nth-child(8).tab--selected {
+                background: linear-gradient(135deg, #475569 0%, #334155 100%) !important;
+                box-shadow: 0 4px 6px rgba(71, 85, 105, 0.3) !important;
+            }
+
+            /* Badge for Logs tab */
+            .logs-badge {
+                display: inline-block;
+                background-color: white;
+                color: #ef4444;
+                font-size: 11px;
+                font-weight: 700;
+                padding: 2px 6px;
+                border-radius: 10px;
+                margin-left: 6px;
+                min-width: 18px;
+                text-align: center;
+                animation: pulse 2s infinite;
+            }
+
+            @keyframes pulse {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.8;
+                }
+            }
+
+            /* Tab container styling */
+            .tabs {
+                background: transparent !important;
+                border-bottom: none !important;
+            }
+
+            /* Tab content area */
+            .tab-content {
+                border: none !important;
+            }
         </style>
     </head>
     <body>
@@ -74,23 +224,30 @@ app.index_string = '''
 </html>
 '''
 
-
 # Define the layout
 app.layout = html.Div([
     html.Div([
         html.H1("Road to $100K", style={'color': '#1f2937'}),
-        html.P("Comprehensive view of all trades", style={'color': '#6b7280'}),
     ], style={'padding': '20px', 'backgroundColor': 'white', 'marginBottom': '20px', 'borderRadius': '8px',
               'boxShadow': '0 1px 3px rgba(0,0,0,0.1)'}),
 
-    dcc.Tabs(id='tabs', value='dashboard', children=[
-        dcc.Tab(label='Dashboard', value='dashboard'),
-        dcc.Tab(label='Add Trade', value='add_trade'),
-        dcc.Tab(label='Capital', value='capital'),
-        dcc.Tab(label='Tax Calculator', value='taxes'),
-        dcc.Tab(label='Maintenance', value='maintenance'),
-        dcc.Tab(label='Settings', value='settings'),
-    ]),
+    # Store for unread count
+    dcc.Store(id='unread-logs-count', data=0),
+
+    html.Div([
+        dcc.Tabs(id='tabs', value='dashboard', children=[
+            dcc.Tab(label='Dashboard', value='dashboard'),
+            dcc.Tab(label='Add Trade', value='add_trade'),
+            dcc.Tab(label='Analyze', value='analyze'),
+            dcc.Tab(label='Capital', value='capital'),
+            dcc.Tab(label='Tax Calculator', value='taxes'),
+            dcc.Tab(label='Logs', value='logs'),
+            dcc.Tab(label='Maintenance', value='maintenance'),
+            dcc.Tab(label='Settings', value='settings'),
+        ]),
+        # Badge overlay for Logs tab
+        html.Div(id='logs-badge-overlay', style={'position': 'relative'}),
+    ], style={'position': 'relative'}),
 
     html.Div(id='tab-content', style={'marginTop': '20px', 'border-radius': '25px'}),
 
@@ -110,10 +267,16 @@ def render_tab_content(tab):
         return render_dashboard()
     elif tab == 'add_trade':
         return render_add_trade()
+    elif tab == 'analyze':
+        from components.analyze import render_analyze
+        return render_analyze()
     elif tab == 'capital':
         return render_capital()
     elif tab == 'taxes':
         return render_taxes()
+    elif tab == 'logs':  # ADD THIS
+        from components.logs import render_logs
+        return render_logs(db)
     elif tab == 'maintenance':
         return render_maintenance()
     elif tab == 'settings':
@@ -153,8 +316,6 @@ def render_dashboard():
 
     zero_loss_color = get_streak_color(streak_data['zero_loss_current'])
 
-
-
     # Stats cards
     stats_cards = html.Div([
 
@@ -169,8 +330,6 @@ def render_dashboard():
         ], style={'padding': '20px', 'backgroundColor': 'white', 'borderRadius': '8px',
                   'boxShadow': '0 1px 3px rgba(0,0,0,0.1)', 'width': '10vw', 'height': '9vh',
                   'display': 'flex', 'flexDirection': 'column', 'justifyContent': 'center'}),
-
-
 
         html.Div([
             html.P("Total Profit", style={'fontSize': '14px', 'color': '#6b7280', 'marginBottom': '8px'}),
@@ -189,8 +348,7 @@ def render_dashboard():
                   'boxShadow': '0 1px 3px rgba(0,0,0,0.1)', 'width': '10vw', 'height': '9vh',
                   'display': 'flex', 'flexDirection': 'column', 'justifyContent': 'center'}),
 
-
-        #Streak Card
+        # Streak Card
         html.Div([
             html.P("Zero Loss Profit Streak",
                    style={'fontSize': '14px', 'color': '#6b7280', 'marginBottom': '3px', 'textAlign': 'center'}),
@@ -205,7 +363,7 @@ def render_dashboard():
             html.P(f"Longest Zero Loss: {streak_data['zero_loss_best']} Days",
                    style={'fontSize': '12px', 'color': '#6b7280', 'textAlign': 'center', 'margin': '0'}),
         ], style={'padding': '20px', 'backgroundColor': 'white', 'borderRadius': '8px',
-                  'boxShadow': '0 1px 3px rgba(0,0,0,0.1)','width': '10vw', 'height': '9vh',
+                  'boxShadow': '0 1px 3px rgba(0,0,0,0.1)', 'width': '10vw', 'height': '9vh',
                   'display': 'flex', 'flexDirection': 'column', 'justifyContent': 'center'}),
 
         html.Div([
@@ -224,16 +382,14 @@ def render_dashboard():
                   'boxShadow': '0 1px 3px rgba(0,0,0,0.1)', 'width': '10vw', 'height': '9vh',
                   'display': 'flex', 'flexDirection': 'column', 'justifyContent': 'center'}),
 
-
     ], style={'padding': '20px', 'marginBottom': '20px', 'textAlign': 'center', 'backgroundColor': 'MediumAquamarine',
               'display': 'flex',  # Enable Flexbox
               'justifyContent': 'space-between',  # Distribute space evenly (optional, use if needed)
               'alignItems': 'flex-start'})
 
-#Graphs
+    # Graphs
     calendar_component = render_calendar(db)
     hourly_chart = render_hourly_chart(db)
-
 
     # Win rate by day
     win_rate_by_day = df.groupby('day_of_week').agg({
@@ -312,9 +468,20 @@ def render_dashboard():
 
     return html.Div([
         stats_cards,
-        html.Div([calendar_component],
-                 style={'width': '49%', 'display': 'inline-block', 'marginRight': '2%', 'verticalAlign': 'top'}),
-        html.Div([hourly_chart], style={'width': '49%', 'display': 'inline-block', 'verticalAlign': 'top'}),
+        html.Div([
+            # Calendar - 50% width
+            html.Div([calendar_component],
+                     style={'width': '49%', 'display': 'inline-block', 'verticalAlign': 'top', 'marginRight': '0.5%'}),
+
+            # Hourly Performance - 25% width
+            html.Div([hourly_chart],
+                     style={'width': '24.5%', 'display': 'inline-block', 'verticalAlign': 'top',
+                            'marginRight': '0.5%'}),
+
+            # Profits by Price - 25% width
+            html.Div([render_profits_by_price(db)],
+                     style={'width': '24.5%', 'display': 'inline-block', 'verticalAlign': 'top'}),
+        ], style={'marginBottom': '20px'}),
         trade_table_section
     ])
 
@@ -357,6 +524,16 @@ def save_trade(n_clicks, date, ticker, sector, news, entry_price, entry_time, ex
     }
 
     db.add_trade(trade_data)
+
+    # ADD LOG
+    profit_loss = (float(exit_price) - float(entry_price)) * int(shares)
+    db.add_log(
+        action_type='ADD_TRADE',
+        action_category='TRADE',
+        description=f'Added trade: {ticker.upper()} - ${profit_loss:.2f} P/L',
+        details=f'Entry: ${entry_price}, Exit: ${exit_price}, Shares: {shares}, Date: {date}'
+    )
+
     return f"✓ Trade saved successfully! ({ticker})"
 
 
@@ -656,6 +833,15 @@ def add_deposit(n_clicks, date, amount, notes):
         return "Please enter a valid amount"
 
     db.add_capital_transaction(date, 'deposit', float(amount), notes or '')
+
+    # ADD LOG
+    db.add_log(
+        action_type='ADD_DEPOSIT',
+        action_category='CAPITAL',
+        description=f'Deposit added: ${float(amount):.2f}',
+        details=f'Date: {date}, Notes: {notes or "None"}'
+    )
+
     return f"✓ Deposit of ${float(amount):.2f} added successfully!"
 
 
@@ -672,6 +858,15 @@ def add_withdrawal(n_clicks, date, amount, notes):
         return "Please enter a valid amount"
 
     db.add_capital_transaction(date, 'withdrawal', float(amount), notes or '')
+
+    # ADD LOG
+    db.add_log(
+        action_type='ADD_WITHDRAWAL',
+        action_category='CAPITAL',
+        description=f'Withdrawal added: ${float(amount):.2f}',
+        details=f'Date: {date}, Notes: {notes or "None"}'
+    )
+
     return f"✓ Withdrawal of ${float(amount):.2f} added successfully!"
 
 
@@ -779,6 +974,7 @@ def set_quick_query(view_trades, view_capital, count, clear):
 
 
 # Callback for query execution
+
 @app.callback(
     Output('query-output', 'children'),
     Input('execute-query-btn', 'n_clicks'),
@@ -794,126 +990,76 @@ def execute_sql_query(n_clicks, query):
 
     result = db.execute_query(query)
 
+    # ADD LOG
     if result['success']:
-        if result['type'] == 'select':
-            # Display SELECT results in a table
-            if len(result['rows']) == 0:
-                return html.Div([
-                    html.Div([
-                        html.P("✓ " + result['message'], style={'color': '#10b981', 'fontWeight': '500'}),
-                    ], style={'padding': '15px', 'backgroundColor': '#d1fae5', 'borderRadius': '6px',
-                              'marginBottom': '15px'}),
-                    html.P("No rows returned.", style={'color': '#6b7280', 'fontStyle': 'italic'})
-                ])
+        db.add_log(
+            action_type='SQL_QUERY',
+            action_category='DATABASE',
+            description=f'SQL query executed: {result["type"]}',
+            details=f'Query: {query[:100]}... | Rows affected/returned: {result.get("rows_affected", len(result.get("rows", [])))}'
+        )
 
-            # Create table data
-            table_data = []
-            for row in result['rows']:
-                row_dict = {}
-                for i, col in enumerate(result['columns']):
-                    row_dict[col] = row[i]
-                table_data.append(row_dict)
+    # ... rest of the existing code ...
 
-            return html.Div([
-                html.Div([
-                    html.P("✓ " + result['message'], style={'color': '#10b981', 'fontWeight': '500'}),
-                ], style={'padding': '15px', 'backgroundColor': '#d1fae5', 'borderRadius': '6px',
-                          'marginBottom': '15px'}),
 
-                dash_table.DataTable(
-                    data=table_data,
-                    columns=[{'name': col, 'id': col} for col in result['columns']],
-                    style_table={'overflowX': 'auto'},
-                    style_cell={
-                        'textAlign': 'left',
-                        'padding': '10px',
-                        'fontFamily': 'monospace',
-                        'fontSize': '12px'
-                    },
-                    style_header={
-                        'backgroundColor': '#f3f4f6',
-                        'fontWeight': 'bold',
-                        'border': '1px solid #e5e7eb'
-                    },
-                    style_data={
-                        'border': '1px solid #e5e7eb'
-                    },
-                    page_size=20,
-                )
-            ])
-        else:
-            # Display modification results
-            return html.Div([
-                html.Div([
-                    html.P("✓ " + result['message'],
-                           style={'color': '#10b981', 'fontWeight': '500', 'fontSize': '14px'}),
-                ], style={'padding': '15px', 'backgroundColor': '#d1fae5', 'borderRadius': '6px'})
-            ])
-    else:
-        # Display error
-        return html.Div([
-            html.Div([
-                html.P("✗ Query Failed", style={'color': '#ef4444', 'fontWeight': '500', 'marginBottom': '8px'}),
-                html.P(result['message'], style={'color': '#991b1b', 'fontFamily': 'monospace', 'fontSize': '13px'}),
-            ], style={'padding': '15px', 'backgroundColor': '#fee2e2', 'borderRadius': '6px',
-                      'border': '1px solid #fca5a5'})
-        ])
+# Update color hex displays
+@app.callback(
+    [Output('color-profit-primary-hex', 'children'),
+     Output('color-profit-secondary-hex', 'children'),
+     Output('color-loss-primary-hex', 'children'),
+     Output('color-loss-secondary-hex', 'children'),
+     Output('color-accent-primary-hex', 'children')],
+    [Input('color-profit-primary', 'value'),
+     Input('color-profit-secondary', 'value'),
+     Input('color-loss-primary', 'value'),
+     Input('color-loss-secondary', 'value'),
+     Input('color-accent-primary', 'value')]
+)
+def update_hex_displays(c1, c2, c3, c4, c5):
+    return c1, c2, c3, c4, c5
 
-    # Update color hex displays
-    @app.callback(
-        [Output('color-profit-primary-hex', 'children'),
-         Output('color-profit-secondary-hex', 'children'),
-         Output('color-loss-primary-hex', 'children'),
-         Output('color-loss-secondary-hex', 'children'),
-         Output('color-accent-primary-hex', 'children')],
-        [Input('color-profit-primary', 'value'),
-         Input('color-profit-secondary', 'value'),
-         Input('color-loss-primary', 'value'),
-         Input('color-loss-secondary', 'value'),
-         Input('color-accent-primary', 'value')]
-    )
-    def update_hex_displays(c1, c2, c3, c4, c5):
-        return c1, c2, c3, c4, c5
 
-    # Save settings
-    @app.callback(
-        Output('settings-save-status', 'children'),
-        Input('save-settings-btn', 'n_clicks'),
-        [State('color-profit-primary', 'value'),
-         State('color-profit-secondary', 'value'),
-         State('color-loss-primary', 'value'),
-         State('color-loss-secondary', 'value'),
-         State('color-accent-primary', 'value')],
-        prevent_initial_call=True
-    )
-    def save_settings(n_clicks, profit_pri, profit_sec, loss_pri, loss_sec, accent):
-        db.save_setting('color_profit_primary', profit_pri)
-        db.save_setting('color_profit_secondary', profit_sec)
-        db.save_setting('color_loss_primary', loss_pri)
-        db.save_setting('color_loss_secondary', loss_sec)
-        db.save_setting('color_accent_primary', accent)
+# Save settings
+@app.callback(
+    Output('settings-save-status', 'children'),
+    Input('save-settings-btn', 'n_clicks'),
+    [State('color-profit-primary', 'value'),
+     State('color-profit-secondary', 'value'),
+     State('color-loss-primary', 'value'),
+     State('color-loss-secondary', 'value'),
+     State('color-accent-primary', 'value')],
+    prevent_initial_call=True
+)
+def save_settings(n_clicks, profit_pri, profit_sec, loss_pri, loss_sec, accent):
+    db.save_setting('color_profit_primary', profit_pri)
+    db.save_setting('color_profit_secondary', profit_sec)
+    db.save_setting('color_loss_primary', loss_pri)
+    db.save_setting('color_loss_secondary', loss_sec)
+    db.save_setting('color_accent_primary', accent)
 
-        return html.Div([
-            html.P("✓ Settings saved! Refresh the page to see changes.",
-                   style={'color': '#10b981', 'fontWeight': '500', 'backgroundColor': '#d1fae5',
-                          'padding': '10px 15px', 'borderRadius': '6px', 'marginTop': '10px'})
-        ])
+    return html.Div([
+        html.P("✓ Settings saved! Refresh the page to see changes.",
+               style={'color': '#10b981', 'fontWeight': '500', 'backgroundColor': '#d1fae5',
+                      'padding': '10px 15px', 'borderRadius': '6px', 'marginTop': '10px'})
+    ])
 
-    # Reset settings
-    @app.callback(
-        Output('settings-save-status', 'children', allow_duplicate=True),
-        Input('reset-settings-btn', 'n_clicks'),
-        prevent_initial_call=True
-    )
-    def reset_settings(n_clicks):
-        db.reset_settings()
-        return html.Div([
-            html.P("✓ Settings reset to defaults! Refresh the page.",
-                   style={'color': '#3b82f6', 'fontWeight': '500', 'backgroundColor': '#dbeafe',
-                          'padding': '10px 15px', 'borderRadius': '6px', 'marginTop': '10px'})
-        ])
 
-#Call backs for Validation
+# Reset settings
+@app.callback(
+    Output('settings-save-status', 'children', allow_duplicate=True),
+    Input('reset-settings-btn', 'n_clicks'),
+    prevent_initial_call=True
+)
+def reset_settings(n_clicks):
+    db.reset_settings()
+    return html.Div([
+        html.P("✓ Settings reset to defaults! Refresh the page.",
+               style={'color': '#3b82f6', 'fontWeight': '500', 'backgroundColor': '#dbeafe',
+                      'padding': '10px 15px', 'borderRadius': '6px', 'marginTop': '10px'})
+    ])
+
+
+# Call backs for Validation
 
 # ==================== VALIDATION CALLBACKS ====================
 
@@ -968,7 +1114,8 @@ def validate_ticker(value):
 def validate_sector(value):
     base_style = {'fontSize': '18px', 'marginLeft': '8px'}
 
-    if not value:
+    # Since it's now auto-filled, just check if it has a value
+    if not value or value == '':
         return "●", {**base_style, 'color': '#9ca3af'}
     return "✓", {**base_style, 'color': '#10b981', 'fontWeight': 'bold'}
 
@@ -1141,7 +1288,8 @@ def validate_float(value):
 # ==================== API FETCH CALLBACK ====================
 
 @app.callback(
-    [Output('trade-industry', 'value'),
+    [Output('trade-sector', 'value'),
+     Output('trade-industry', 'value'),
      Output('trade-volume', 'value'),
      Output('trade-avg-volume', 'value'),
      Output('trade-float', 'value'),
@@ -1174,9 +1322,12 @@ def fetch_stock_data_for_form(n_clicks, ticker):
         if data.get('success'):
             volume = f"{int(data.get('volume', 0)):,}" if data.get('volume') else None
             avg_vol = f"{int(data.get('averageVolume', 0)):,}" if data.get('averageVolume') else None
-            float_val = f"{int(data.get('freeFloat', 0)):,}" if data.get('freeFloat') else None
+            # Float is returned in millions, convert to full number
+            float_raw = data.get('freeFloat', 0)
+            float_val = f"{int(float_raw * 1_000_000):,}" if float_raw else None
 
             return (
+                data.get('sector', ''),
                 data.get('industry', ''),
                 volume,
                 avg_vol,
@@ -1199,6 +1350,62 @@ def fetch_stock_data_for_form(n_clicks, ticker):
                    style={'color': '#ef4444', 'padding': '10px', 'backgroundColor': '#fee2e2',
                           'borderRadius': '6px', 'fontSize': '13px'})
         ])
+
+
+# Analyze Callbacks
+# Register analyze callbacks
+from callbacks.analyze_callbacks import register_analyze_callbacks
+
+register_analyze_callbacks(app)
+
+# Logs callbacks
+from callbacks.analyze_callbacks import register_analyze_callbacks
+from callbacks.logs_callbacks import register_logs_callbacks
+
+register_analyze_callbacks(app)
+register_logs_callbacks(app, db)
+
+
+# Simple badge overlay that doesn't break tabs
+@app.callback(
+    Output('logs-badge-overlay', 'children'),
+    [Input('save-trade-btn', 'n_clicks'),
+     Input('add-deposit-btn', 'n_clicks'),
+     Input('add-withdrawal-btn', 'n_clicks'),
+     Input('execute-query-btn', 'n_clicks'),
+     Input('tabs', 'value')],
+    prevent_initial_call=False
+)
+def update_badge_overlay(trade_clicks, deposit_clicks, withdrawal_clicks, query_clicks, current_tab):
+    from dash import callback_context
+
+    # If user is on logs tab, mark all as read
+    if current_tab == 'logs':
+        db.mark_logs_as_read()
+
+    # Get unread count
+    unread_count = db.get_unread_logs_count()
+
+    if unread_count > 0 and current_tab != 'logs':
+        return html.Div(
+            str(unread_count),
+            style={
+                'position': 'absolute',
+                'top': '-45px',
+                'left': '620px',  # Adjust this value to position over Logs tab
+                'backgroundColor': '#ef4444',
+                'color': 'white',
+                'fontSize': '11px',
+                'fontWeight': '700',
+                'padding': '3px 7px',
+                'borderRadius': '10px',
+                'minWidth': '20px',
+                'textAlign': 'center',
+                'zIndex': '1000',
+                'animation': 'pulse 2s infinite'
+            }
+        )
+    return html.Div()
 
 
 if __name__ == '__main__':
